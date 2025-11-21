@@ -6,7 +6,7 @@ $products = get_query_var('products');
 ?>
 
 <section style="background-image: url('<?= $background ?>');" class="w-full pt-26 pb-24 bg-orange bg-no-repeat bg-center bg-cover">
-    <div class="container mx-auto max-w-3xl">
+    <div class="container mx-auto max-w-3xl flex md:block justify-center items-center px-4">
         <?php foreach ($products as $type_slug => $data): ?>
             <div class="flex flex-col gap-6">
                 <div class="flex flex-row gap-10 items-center text-white">
