@@ -20,3 +20,4 @@ wp-includes/
 wp-admin/
 
 !wp-content/uploads/2025/
+!wp-content/plugins/**/vendor/
