@@ -39,7 +39,7 @@ foreach ($gallery_ids as $i => $gid) {
                         ?>
                             <figure class="relative w-[<?= $wMobile ?>vw] md:w-[<?= $w ?>vw] overflow-hidden shrink-0 group snap-center">
                                 <!-- safelist: h-[220px] md:h-[300px] -->
-                                <img class="block w-full h-[220px] md:h-[300px] object-cover" src="<?= esc_url($url) ?>" alt="<?= esc_attr($caption ?: 'Galeri') ?>">
+                                <img class="block w-full h-[220px] md:h-[300px] object-cover cursor-zoom-in gallery-thumb" src="<?= esc_url($url) ?>" alt="<?= esc_attr($caption ?: 'Galeri') ?>" data-full="<?= esc_url(wp_get_attachment_image_url($id, 'full')) ?>" data-caption="<?= esc_attr($caption ?: '') ?>">
                                 <figcaption class="absolute bottom-0 left-0 right-0 bg-black/80 text-white px-4 py-2">
                                     <span class="text-sm md:text-base font-medium"><?= $caption ? esc_html($caption) : 'Kegiatan N/A' ?></span>
                                 </figcaption>
@@ -56,7 +56,7 @@ foreach ($gallery_ids as $i => $gid) {
                         ?>
                             <figure class="relative w-[<?= $wMobile ?>vw] md:w-[<?= $w ?>vw] overflow-hidden shrink-0 group">
                                 <!-- safelist: h-[220px] md:h-[300px] -->
-                                <img class="block w-full h-[220px] md:h-[300px] object-cover" src="<?= esc_url($url) ?>" alt="<?= esc_attr($caption ?: 'Galeri') ?>">
+                                <img class="block w-full h-[220px] md:h-[300px] object-cover cursor-zoom-in gallery-thumb" src="<?= esc_url($url) ?>" alt="<?= esc_attr($caption ?: 'Galeri') ?>" data-full="<?= esc_url(wp_get_attachment_image_url($id, 'full')) ?>" data-caption="<?= esc_attr($caption ?: '') ?>">
                                 <figcaption class="absolute bottom-0 left-0 right-0 bg-black/80 text-white px-4 py-2">
                                     <span class="text-sm md:text-base font-medium"><?= $caption ? esc_html($caption) : 'Kegiatan N/A' ?></span>
                                 </figcaption>
@@ -77,3 +77,67 @@ foreach ($gallery_ids as $i => $gid) {
         </div>
     </div>
 </section>
+
+<!-- Lightbox modal -->
+<div id="lightbox" class="hidden fixed inset-0 bg-black/80 z-50 items-center justify-center p-4" aria-hidden="true">
+    <div class="relative max-w-[90vw] max-h-[90vh]">
+        <button id="lightboxClose" class="absolute text-xl -top-3 -right-3 w-[30px] h-[30px] rounded-full p-2 shadow-md z-50 flex justify-center items-center cursor-pointer bg-dark-orange text-white" aria-label="Tutup galeri">x</button>
+        <figure class="m-0 flex flex-col justify-center items-center">
+            <img id="lightboxImg" src="" alt="" class="block max-w-full max-h-[80vh] object-contain" />
+            <figcaption id="lightboxCaption" class="w-fit mt-2 text-center text-white text-sm md:text-xl bg-black/20 p-2 rounded-xl"></figcaption>
+        </figure>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var lightbox = document.getElementById('lightbox');
+        var lightboxImg = document.getElementById('lightboxImg');
+        var lightboxCaption = document.getElementById('lightboxCaption');
+        var closeBtn = document.getElementById('lightboxClose');
+
+        function openLightbox(src, caption, alt) {
+            if (!src) return;
+            lightboxImg.src = src;
+            lightboxImg.alt = alt || '';
+            lightboxCaption.textContent = caption || '';
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            lightbox.setAttribute('aria-hidden', 'false');
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+            closeBtn.focus();
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            lightbox.setAttribute('aria-hidden', 'true');
+            lightboxImg.src = '';
+            lightboxCaption.textContent = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.gallery-thumb').forEach(function(img) {
+            img.setAttribute('tabindex', '0');
+            img.addEventListener('click', function() {
+                openLightbox(img.dataset.full, img.dataset.caption, img.alt);
+            });
+            img.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLightbox(img.dataset.full, img.dataset.caption, img.alt);
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) closeLightbox();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    })();
+</script>
